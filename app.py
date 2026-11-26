@@ -16,8 +16,15 @@ load_dotenv(BASE_DIR / ".env")
 
 def create_app(test_config=None):
     app = Flask(__name__, template_folder="templates", static_folder="static")
+    database_path = os.getenv("VOCABMATE_DATABASE", "").strip()
+    if not database_path:
+        database_path = (
+            "/tmp/vocabmate.db"
+            if os.getenv("VERCEL")
+            else str(BASE_DIR / "data" / "vocabmate.db")
+        )
     app.config.update(
-        DATABASE_PATH=os.getenv("VOCABMATE_DATABASE", str(BASE_DIR / "data" / "vocabmate.db")),
+        DATABASE_PATH=database_path,
         GEMINI_API_KEY=os.getenv("GEMINI_API_KEY", "").strip(),
         MAX_CONTENT_LENGTH=16 * 1024,
         JSON_SORT_KEYS=False,

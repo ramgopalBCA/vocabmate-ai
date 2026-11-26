@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -43,6 +44,13 @@ class VocabMateAppTests(unittest.TestCase):
         frontend = self.client.get("/").data + app_js_data + chat_js_data
         self.assertNotIn(b"test-api-key", frontend)
         self.assertNotIn(b"GEMINI_API_KEY", frontend)
+
+    def test_vercel_uses_writable_temporary_sqlite_path(self):
+        with patch.dict(os.environ, {"VERCEL": "1", "VOCABMATE_DATABASE": ""}):
+            with patch("app.Database.initialize"):
+                app = create_app()
+
+        self.assertEqual(app.config["DATABASE_PATH"], "/tmp/vocabmate.db")
 
     def test_learning_routes_and_statistics(self):
         for route in ("/api/dashboard", "/api/vocabulary", "/api/daily-words", "/api/progress", "/api/history"):

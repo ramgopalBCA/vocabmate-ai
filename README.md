@@ -16,7 +16,7 @@ The SQLite database is created at `data/vocabmate.db` on first launch. Set `VOCA
 
 ## Deploy the separate Netlify version
 
-The static site lives in `netlify-site/`; the Flask/SQLite application above is retained and is not used by the Netlify or Vercel deployment. The static version keeps the existing dashboard design and stores learning progress, favorites, quiz results, and chat history in the visitor's browser using `localStorage`.
+The separate Netlify static site lives in `netlify-site/`; it does not replace the Flask/SQLite application. The static version keeps the existing dashboard design and stores learning progress, favorites, quiz results, and chat history in the visitor's browser using `localStorage`.
 
 ### Deploy from GitHub
 
@@ -31,6 +31,8 @@ Without `GEMINI_API_KEY`, the serverless tutor returns its built-in demo respons
 
 ## Deploy on Vercel
 
-The repository root is the Vercel project root. Import the Git repository into Vercel and leave the **Root Directory** as `.`. `vercel.json` publishes the existing `netlify-site/` static frontend, and `api/chat.js` adapts the existing tutor handler to Vercel's Node.js function API; `/api/chat/status` is rewritten to that same function. Do not set `netlify-site` as Vercel's Root Directory, or Vercel will not include the API function.
+The Vercel deployment runs the existing Flask application, not the separate Netlify static demo. Import the Git repository into Vercel and keep the **Root Directory** at the repository root (`.`). Vercel detects the Python function at `api/index.py`, which imports the existing `app` instance from `app.py`. `vercel.json` sends incoming page, static-asset, and API requests to Flask; the function bundle explicitly includes `templates/` and `static/`.
 
-In the Vercel project settings, add `GEMINI_API_KEY` under **Settings → Environment Variables** to enable live Gemini responses, then redeploy. The key is read only by the serverless function and is not included in the frontend. Without the variable, tutor demo responses work. Vocabulary, favorites, learned words, quizzes, progress, and chat history work without the key and are stored locally in each visitor's browser. The original Flask/SQLite project remains in the repository but is not used by this static Vercel deployment.
+Vercel's function filesystem is not persistent. On Vercel, the app uses `/tmp/vocabmate.db` (or `VOCABMATE_DATABASE` if set), which is writable but temporary and may not be shared between function instances. Vocabulary is initialized from the app's built-in word list; user progress and chat history stored in SQLite can reset or differ between instances. For durable multi-user data, configure an external database before relying on production progress. Locally, SQLite continues to use `data/vocabmate.db`.
+
+Add `GEMINI_API_KEY` in Vercel **Settings → Environment Variables** if you want live Gemini tutor responses, then redeploy. The key remains server-side and is not exposed to templates or static assets. Keep `requirements.txt` at the repository root so Vercel installs Flask and the existing Python dependencies. After importing the project, verify the Vercel **Root Directory** is `.` and the deployment uses the Python function in `api/index.py`; do not set `netlify-site/` as the root directory.

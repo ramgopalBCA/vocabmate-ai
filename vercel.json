@@ -1,9 +1,13 @@
 {
-  "outputDirectory": "netlify-site",
   "rewrites": [
     {
-      "source": "/api/chat/status",
-      "destination": "/api/chat"
+      "source": "/(.*)",
+      "destination": "/api/index"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "{templates,static}/**"
+    }
+  }
 }
