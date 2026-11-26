@@ -1,4 +1,6 @@
 .env
+.netlify/
+.vercel/
 __pycache__/
 *.py[cod]
 .venv/

@@ -1,0 +1,9 @@
+{
+  "outputDirectory": "netlify-site",
+  "rewrites": [
+    {
+      "source": "/api/chat/status",
+      "destination": "/api/chat"
+    }
+  ]
+}

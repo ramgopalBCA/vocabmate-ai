@@ -1,0 +1,23 @@
+[build]
+  publish = "netlify-site"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/chat/status"
+  to = "/.netlify/functions/tutor"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/tutor"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "same-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
